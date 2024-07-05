@@ -20,8 +20,13 @@ dto.setId(session.getAttribute("UserId").toString());
 
 // DAO 인스턴스 생성
 BoardDAO dao = new BoardDAO(application);
-// 메서드 호출해서 insert 쿼리문 실행
-int iResult = dao.insertWrite(dto);
+
+int iResult = 0;
+for (int i=1; i<=100; i++) {	
+	dto.setTitle(title + " " + i + "번째 게시물");
+	// 메서드 호출해서 insert 쿼리문 실행
+	iResult = dao.insertWrite(dto);
+}
 // 연결 해제
 dao.close();
 

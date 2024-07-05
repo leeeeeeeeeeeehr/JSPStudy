@@ -1,3 +1,5 @@
+<%@page import="utils.BoardPage"%>
+<%@page import="javax.security.auth.login.AccountNotFoundException"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
@@ -27,8 +29,38 @@ if (searchWord != null) {
 
 // Map을 인수로 게시물의 갯수를 카운트
 int totalCount = dao.selectCount(param);
+
+/*************** 페이징 관련 코드 추가 ***************/
+
+/* web.xml에 설정한 컨텍스트 초기화 파라미터를 읽어온다.
+초기화 파라미터는 String으로 저장되므로 산술연산을 위해서는 int형으로 변환해야 한다. */
+int pageSize = Integer.parseInt(application.getInitParameter("POSTS_PER_PAGE"));
+int blockPage = Integer.parseInt(application.getInitParameter("PAGES_PER_BLOCK"));
+
+/* 전체 페이지 수를 계산한다.
+'(전체 게시물의 수) / (페이지 당 게시물의 수)'의 결과값 올림 처리
+
+ex ) 108 / 10 = 10.8을 올림 처리하여 11페이지로 계산한다. */
+int totalPage = (int)Math.ceil((double)totalCount / pageSize);
+
+/* 목록에 처음 진입했을 때는 페이지 관련 파라미터가 없는 상태이므로 1page로 지정한다.
+만약 파라미터 pageNum이 있다면 request 내장 객체를 통해 받아온 후 페이지 번호로 지정하면 된다. */
+int pageNum = 1;
+String pageTemp = request.getParameter("pageNum");
+if (pageTemp != null && !pageTemp.equals("")) {
+	pageNum = Integer.parseInt(pageTemp);
+}
+
+/* 게시물의 구간을 계산한다. 각 페이지의 시작 번호와 종료 번호를
+현재 페이지 번호와 페이지 사이즈를 통해 계산한 후 DAO로 전달하기 위해 Map에 추가한다. */
+int start = (pageNum - 1) * pageSize + 1;
+int end = pageNum * pageSize;
+param.put("start", start);
+param.put("end", end);
+/***********************************************/
+
 // 목록에 출력한 게시물을 인출하여 반환
-List<BoardDTO> boardLists = dao.selectList(param);
+List<BoardDTO> boardLists = dao.selectListPage(param);
 // DB 연결 해제
 dao.close();
 %>
@@ -42,7 +74,7 @@ dao.close();
 <body>
 	<jsp:include page="../Common/Link.jsp" />
 
-	<h2>목록 보기(List)</h2>
+	<h2>목록 보기(List) - 현재 페이지 : <%= pageNum %> (전체 : <%= totalPage %>)</h2>
 	<form method="get">
 	<table border="1" width="90%">
 	<tr>
@@ -75,12 +107,14 @@ if (boardLists.isEmpty()) {
 		<td colspan="5" align="center">등록된 게시물이 없습니다.</td>
 	</tr>
 <%
-} else {
+}
+else {
 	// 출력할 데이터가 있다면 확장 for문으로 반복해서 출력한다.
 	int virtualNum = 0;
+	int countNum = 0;
 	for (BoardDTO dto : boardLists) {
 		// 게시물의 갯수로 목록의 가상 번호를 부여한다.
-		virtualNum = totalCount--;
+		virtualNum = totalCount - (((pageNum - 1) * pageSize) + countNum++);
 %>
 	<tr align="center">
 		<td><%= virtualNum %></td>
@@ -99,6 +133,8 @@ if (boardLists.isEmpty()) {
 
 	<table border="1" width="90%">
 	<tr align="right">
+		<td><%= BoardPage.pagingStr(totalCount, pageSize, blockPage,
+										pageNum, request.getRequestURI()) %></td>
 		<td>
 			<button type="button" onclick="location.href='Write.jsp';">글쓰기</button>
 		</td>

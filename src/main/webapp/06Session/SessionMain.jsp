@@ -8,12 +8,12 @@ SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
 // 세션이 생성된 시간
 long creationTime = session.getCreationTime();
-String creationTimeStr = dateFormat.format(new Date(creationTime));
-
 // 세션에 마지막으로 접근한 시간
 long lastTime = session.getLastAccessedTime(); 
-String lastTimeStr = dateFormat.format(new Date(lastTime));
+
 // 위 2개의 시간을 우리가 정한 서식을 적용한 문자열로 변경
+String creationTimeStr = dateFormat.format(new Date(creationTime));
+String lastTimeStr = dateFormat.format(new Date(lastTime));
 
 // session 내장객체를 통해 세션 유지시간 설정, 초 단위
 session.setMaxInactiveInterval(60 * 20);

@@ -6,8 +6,6 @@
 // 로그인 폼에서 전송(submit)한 폼 값을 받는다.
 String userId = request.getParameter("user_id");
 String userPwd = request.getParameter("user_pw");
-System.out.println(userId + " = " + userPwd);
-out.println(userId + " = " + userPwd);
 
 // application 내장 객체를 이용해서 web.xml에 등록한 접속 정보를 읽어온다.
 String oracleDriver = application.getInitParameter("OracleDriver");
@@ -23,7 +21,7 @@ dao.close();
 
 // 만약 DTO 객체에 아이디가 저장되어 있다면 로그인에 성공한 것으로 판단한다.
 if (memberDTO.getId() != null) {
-	// 세셔 영역에 회원의 아이디와 이름을 저장한다.
+	// 세션 영역에 회원의 아이디와 이름을 저장한다.
 	session.setAttribute("UserId", memberDTO.getId());
 	session.setAttribute("UserName", memberDTO.getName());
 	/* 세션 영역에 저장된 속성값은 페이지를 이동하더라도 유지되므로 로그인 페이지로 이동한다.

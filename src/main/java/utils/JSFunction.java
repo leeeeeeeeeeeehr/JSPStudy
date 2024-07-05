@@ -22,7 +22,7 @@ public class JSFunction {
 		catch (Exception e) {}
 	}
 	
-	public static void alerBack(String msg, JspWriter out) {
+	public static void alertBack(String msg, JspWriter out) {
 		try {
 			String script = ""
 						+ "<script>"

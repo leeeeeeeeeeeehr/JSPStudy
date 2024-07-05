@@ -121,5 +121,152 @@ public class BoardDAO extends JDBConnect {
 		}
 		return result;
 	}
+	
+	// 매개변수로 전달된 게시물의 일련번호로 게시물을 인출한다.
+	public BoardDTO selectView(String num) {
+		// 하나의 레코드를 저장하기 위한 DTO 인스턴스 생성
+		BoardDTO dto = new BoardDTO();
+		
+		// 내부조인을 통해 member 테이블의 name 컬럼까지 select 한다.
+		String query = "SELECT B.*, M.name "
+						+ " FROM member M INNER JOIN board B "
+						+ " ON M.id = B.id "
+						+ " WHERE num=?";
+		
+		try {
+			// 쿼리문의 인파라미터를 설정한 후 쿼리문 실행
+			psmt = con.prepareStatement(query);
+			psmt.setString(1, num);
+			rs = psmt.executeQuery();
+			/* 일련번호는 중복되지 않으므로 단 한개의 게시물만 인출하게 된다.
+			따라서 while문이 아닌 if문으로 처리한다.
+			next()는 ResultSet으로 반환된 레코드를 확인해서 존재하면 true를 반환한다. */
+			if (rs.next()) {
+				/* 각 컬럼의 값을 추출할 때 1부터 시작하는 인덱스와 컬럼명 둘 다 사용할 수 있다.
+				날짜인 경우에는 getDate로 인출할 수 있다. */
+				dto.setNum(rs.getString(1));
+				dto.setTitle(rs.getString(2));
+				dto.setContent(rs.getString("content"));
+				dto.setPostdate(rs.getDate("postdate"));
+				dto.setId(rs.getString("id"));
+				dto.setVisitcount(rs.getString(6));
+				dto.setName(rs.getString("name"));
+				// 인출된 데이터는 DTO 인스턴스에 저장한다.
+			}
+		}
+		catch (Exception e) {
+			System.out.println("게시물 상세보기 중 예외 발생");
+			e.printStackTrace();
+		}
+		return dto;
+	}
+	
+	// 게시물의 조회수를 1 증가시킨다.
+	public void updateVisitCount(String num) {
+		/* 게시물의 일련번호를 통해 visitcount를 1 증가시킨다.
+		이 컬럼은 number 타입이므로 사칙 연산이 가능하다. */
+		String query = "UPDATE board SET "
+						+ " visitcount = visitcount + 1 "
+						+ " WHERE num=?";
+		
+		try {
+			psmt = con.prepareStatement(query);
+			psmt.setString(1, num);
+			psmt.executeQuery();
+		}
+		catch (Exception e) {
+			System.out.println("게시물 조회수 증가 중 예외 발생");
+			e.printStackTrace();
+		}
+	}
+	
+	// 게시물 수정하기
+	public int updateEdit(BoardDTO dto) {
+		int result = 0;
+		
+		try {
+			// 일련번호와 일치하는 게시물의 제목과 내용을 수정하는 update 쿼리문
+			String query = "UPDATE board "
+							+ " SET title=?, content=? "
+							+ " WHERE num=?";
+			// 쿼리문의 인파라미터 설정 및 실행
+			psmt = con.prepareStatement(query);
+			psmt.setString(1, dto.getTitle());
+			psmt.setString(2, dto.getContent());
+			psmt.setString(3, dto.getNum());
+			// 수정된 레코드의 갯수를 반환
+			result = psmt.executeUpdate();
+		}
+		catch (Exception e) {
+			System.out.println("게시물 수정 중 예외 발생");
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	// 게시물 삭제
+	public int deletePost(BoardDTO dto) {
+		int result = 0;
+		
+		try {
+			// 게시물 삭제를 위한 delete 쿼리문
+			String query = "DELETE FROM board WHERE num=?";
+			
+			psmt = con.prepareStatement(query);
+			psmt.setString(1, dto.getNum());
+			
+			result = psmt.executeUpdate();
+		}
+		catch (Exception e)	{
+			System.out.println("게시물 삭제 중 예외 발생");
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	// 페이징 기능이 있는 서브쿼리문으로 변경한 메서드
+	public List<BoardDTO> selectListPage(Map<String, Object> map) {
+		
+		List<BoardDTO> bbs = new Vector<BoardDTO>();
+		
+		// 인파라미터가 있는 서브쿼리문 작성
+		String query = "SELECT * FROM "
+						+ " (SELECT Tb.*, ROWNUM rNum FROM "
+							+ "	(SELECT * FROM board ";
+		// 검색어가 있는 경우에만 where절은 조건부로 추가된다.
+		if (map.get("searchWord") != null) {
+			query += " WHERE " + map.get("searchField")
+						+ " LIKE '%" + map.get("searchWord") + "%' ";
+		}
+		query += " ORDER BY num DESC) Tb) "
+//				+ " WHERE rNum BETWEEN ? AND ?";
+				+ " WHERE rNum >= ? AND rNum <= ?";
+				
+		try {
+			// prepared 인스턴스 생성 및 인파라미터 설정
+			psmt = con.prepareStatement(query);
+			psmt.setString(1, map.get("start").toString());
+			psmt.setString(2, map.get("end").toString());
+			rs = psmt.executeQuery();
+			
+			while (rs.next()) {
+				BoardDTO dto = new BoardDTO();
+
+				dto.setNum(rs.getString("num"));
+				dto.setTitle(rs.getString("title"));
+				dto.setContent(rs.getString("content"));
+				dto.setPostdate(rs.getDate("postdate"));
+				dto.setId(rs.getString("id"));
+				dto.setVisitcount(rs.getString("visitcount"));	
+				
+				bbs.add(dto);
+			}
+		}
+		catch (Exception e) {
+			System.out.println("게시물 조회 중 에외 발생");
+			e.printStackTrace();
+		}
+		return bbs;
+	}
 
 }
