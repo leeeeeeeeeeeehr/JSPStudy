@@ -63,12 +63,12 @@
 	<!-- 1. 한 페이지에 출력할 게시물의 갯수 설정 -->
 	<context-param>
 		<param-name>POSTS_PER_PAGE</param-name>
-		<param-value>10</param-value>
+		<param-value>2</param-value>
 	</context-param>
 	<!-- 2. 한 블럭 당 출력할 페이지 번호의 갯수 설정 -->
  	<context-param>
  		<param-name>PAGES_PER_BLOCK</param-name>
- 		<param-value>5</param-value>
+ 		<param-value>2</param-value>
  	</context-param>
  	
  	<!-- 요청명에 대한 매핑을 설정 -->
@@ -92,5 +92,31 @@
  	<servlet-mapping>
  		<servlet-name>DirectServletPrint</servlet-name>
  		<url-pattern>/12Servlet/DirectServletPrint.do</url-pattern>
+ 	</servlet-mapping>
+ 	
+ 	<!-- 서블릿의 수명주기 메서드를 이용한 회원인증 -->
+ 	<servlet>
+ 		<servlet-name>MemberAuth</servlet-name>
+ 		<servlet-class>servlet.MemberAuth</servlet-class>
+ 		<!-- 등록된 서블릿 내에서만 사용할 수 있는 초기화 파라미터 (지역 상수의 일종) -->
+ 		<init-param>
+ 			<param-name>admin_id</param-name>
+ 			<param-value>nakja</param-value>
+ 		</init-param>
+ 	</servlet>
+ 	<servlet-mapping>
+ 		<servlet-name>MemberAuth</servlet-name>
+ 		<url-pattern>/12Servlet/MemberAuth.mvc</url-pattern>
+ 	</servlet-mapping>
+
+	<!-- 모델2 방식으로 제작하는 서블릿 게시판 -->
+	<!-- 목록 맵핑 --> 	
+ 	<servlet>
+ 		<servlet-name>MVCBoardList</servlet-name>
+ 		<servlet-class>model2.mvcboard.ListController</servlet-class>
+ 	</servlet>
+ 	<servlet-mapping>
+ 		<servlet-name>MVCBoardList</servlet-name>
+ 		<url-pattern>/mvcboard/list.do</url-pattern>
  	</servlet-mapping>
 </web-app>

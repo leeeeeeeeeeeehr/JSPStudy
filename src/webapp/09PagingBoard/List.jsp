@@ -133,8 +133,7 @@ else {
 
 	<table border="1" width="90%">
 	<tr align="right">
-		<td><%= BoardPage.pagingStr(totalCount, pageSize, blockPage,
-										pageNum, request.getRequestURI(), searchField, searchWord) %></td>
+		<td><%= BoardPage.pagingStr(totalCount, pageSize, blockPage, pageNum, request.getRequestURI()) %></td>
 		<td>
 			<button type="button" onclick="location.href='Write.jsp';">글쓰기</button>
 		</td>
