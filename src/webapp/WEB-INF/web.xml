@@ -110,7 +110,7 @@
  	</servlet-mapping>
 
 	<!-- 모델2 방식으로 제작하는 서블릿 게시판 -->
-	<!-- 목록 맵핑 --> 	
+	<!-- 목록 매핑 --> 	
  	<servlet>
  		<servlet-name>MVCBoardList</servlet-name>
  		<servlet-class>model2.mvcboard.ListController</servlet-class>
@@ -118,5 +118,20 @@
  	<servlet-mapping>
  		<servlet-name>MVCBoardList</servlet-name>
  		<url-pattern>/mvcboard/list.do</url-pattern>
+ 	</servlet-mapping>
+ 	
+ 	<!-- 글쓰기 매핑 -->
+ 	<servlet>
+ 		<servlet-name>MVCBoardWrite</servlet-name>
+ 		<servlet-class>model2.mvcboard.WriteController</servlet-class>
+ 		<!-- 파일 업로드 시 제한 용량 설정 -->
+ 		<multipart-config>
+ 			<max-file-size>1048576000</max-file-size>				<!-- 1000MB -->
+ 			<max-request-size>10485760000</max-request-size>		<!-- 10000MB -->
+ 		</multipart-config>
+ 	</servlet>
+ 	<servlet-mapping>
+ 		<servlet-name>MVCBoardWrite</servlet-name>
+ 		<url-pattern>/mvcboard/write.do</url-pattern>
  	</servlet-mapping>
 </web-app>
