@@ -31,6 +31,7 @@ public class ViewController extends HttpServlet {
 		웹 브라우저 출력 시 <br> 태그로 변경해야 한다. */
 		dto.setContent(dto.getContent().replaceAll("\r\n", "<br />"));
 		
+		// 파일의 확장자만 잘라서 request 영역에 저장
 		String ext = dto.getSfile().substring(dto.getSfile().lastIndexOf("."));
 		req.setAttribute("ext", ext);
 		

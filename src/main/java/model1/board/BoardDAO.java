@@ -1,11 +1,13 @@
 package model1.board;
 
+import java.net.CookiePolicy;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
 import common.JDBConnect;
 import jakarta.servlet.ServletContext;
+import utils.CookieManager;
 
 // JDBC를 이용한 DB 연결을 위해 클래스 상속
 public class BoardDAO extends JDBConnect {
@@ -168,7 +170,7 @@ public class BoardDAO extends JDBConnect {
 		String query = "UPDATE board SET "
 						+ " visitcount = visitcount + 1 "
 						+ " WHERE num=?";
-		
+				
 		try {
 			psmt = con.prepareStatement(query);
 			psmt.setString(1, num);

@@ -1,3 +1,4 @@
+<%@page import="utils.CookieManager"%>
 <%@page import="model1.board.BoardDTO"%>
 <%@page import="model1.board.BoardDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -7,8 +8,25 @@
 String num = request.getParameter("num");
 // DAO 인스턴스 생성
 BoardDAO dao = new BoardDAO(application);
-// 게시물 조회수 증가
-dao.updateVisitCount(num);
+
+/************************* 쿠키 관련 코드 추가 *************************/
+
+/* 쿠키가 있는지 확인한다.
+게시물의 일련번호를 이용해 만든 쿠키가 있는지 확인한다. */
+String isCookie = CookieManager.readCookie(request, num);
+
+// 쿠키가 없으면
+if (isCookie.equals("")) {
+	/* 쿠키를 만든다.
+	isCookie라는 쿠키에 num(=페이지 번호와 같은 값)을 넣어준다.
+	이 쿠키는 24시간 유지된다. */
+	CookieManager.makeCookie(response, num, num, 86400);
+	// 게시물 조회수 증가
+	dao.updateVisitCount(num);
+}
+
+/*****************************************************************/
+
 // 출력할 게시물 인출
 BoardDTO dto = dao.selectView(num);
 // DB 연결 해제
